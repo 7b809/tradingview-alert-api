@@ -65,4 +65,17 @@ def get_alerts(page=1):
         }), 200
 
     except Exception as e:
+
         return jsonify({'error': str(e)}), 500
+    
+    
+@webhook.route('/', methods=['GET'])
+def home():
+    return jsonify({
+        "message": "TradingView Webhook API is running 🚀",
+        "routes": {
+            "POST /webhook": "Receive TradingView alerts",
+            "GET /alerts": "Get alerts (page 1)",
+            "GET /alerts/<page>": "Paginated alerts"
+        }
+    }), 200    
