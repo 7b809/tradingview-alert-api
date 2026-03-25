@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from config import Config
 from routes.webhook import webhook_bp
 from routes.alerts import alerts_bp
@@ -10,6 +10,20 @@ def create_app():
     app.register_blueprint(webhook_bp, url_prefix="/webhook")
     app.register_blueprint(alerts_bp, url_prefix="/alerts")
 
+    # ✅ Home Route
+    @app.route("/")
+    def home():
+        return jsonify({
+            "message": "TradingView Webhook API is running 🚀",
+            "routes": {
+                "health": "/health",
+                "webhook": "/webhook/",
+                "alerts": "/alerts/",
+                "alerts_page": "/alerts/<page>"
+            }
+        })
+
+    # ✅ Health Check
     @app.route("/health")
     def health():
         return {"status": "ok"}
