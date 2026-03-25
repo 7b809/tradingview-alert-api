@@ -1,27 +1,38 @@
 from flask import Flask, request, jsonify
-from datetime import datetime, timezone   # ✅ updated import
+from datetime import datetime, timezone
 from config import Config
 from db import alerts_collection
 
 app = Flask(__name__)
 
+
 def serialize_mongo(doc):
     doc['_id'] = str(doc['_id'])
+
+    # ✅ FIX: convert bytes → string (prevents JSON error)
+    if isinstance(doc.get('raw_payload'), bytes):
+        doc['raw_payload'] = doc['raw_payload'].decode('utf-8', errors='replace')
+
     return doc
+
 
 def parse_request_payload(req):
     content_type = req.content_type or 'unknown'
+
     if req.is_json:
         payload = req.get_json(silent=True)
+
     elif content_type.startswith('application/x-www-form-urlencoded') or content_type.startswith('multipart/form-data'):
         payload = req.form.to_dict()
+
     else:
         payload = req.get_data(as_text=True)
+
     return content_type, payload
 
 
 # ==============================
-# ✅ HOME ROUTE (ADDED)
+# HOME ROUTE
 # ==============================
 @app.route('/', methods=['GET'])
 def home():
@@ -43,14 +54,15 @@ def webhook():
     content_type, parsed = parse_request_payload(request)
 
     doc = {
-        # ✅ FIXED (timezone-aware)
         'received_at': datetime.now(timezone.utc),
-
         'content_type': content_type,
         'headers': dict(request.headers),
         'query_params': request.args.to_dict(),
         'parsed_payload': parsed,
-        'raw_payload': request.get_data(),
+
+        # ✅ FIX HERE (store as string instead of bytes)
+        'raw_payload': request.get_data(as_text=True),
+
         'source_ip': request.remote_addr,
         'user_agent': request.user_agent.string
     }
