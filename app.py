@@ -103,10 +103,7 @@ def webhook():
     symbol, signal = extract_fields(parsed, raw_data)
 
     doc = {
-        'received_at': datetime.now(timezone.utc),
-        'content_type': content_type,
-        'headers': dict(request.headers),
-        'query_params': request.args.to_dict(),
+        'received_at': datetime.now(timezone.utc).strftime('%d-%m-%Y %H:%M:%S'),        'content_type': content_type,
         'parsed_payload': parsed,
 
         # ✅ existing logic unchanged
