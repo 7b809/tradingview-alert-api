@@ -1,8 +1,7 @@
 from pymongo import MongoClient
-from config import MONGO_URI, DB_NAME
+from config import Config
 
-client = MongoClient(MONGO_URI)
-db = client[DB_NAME]
+client = MongoClient(Config.MONGO_URI)
+db = client[Config.DB_NAME]
 
-alerts_collection = db["alerts"]
-trades_collection = db["trades"]
+alerts_collection = db[Config.COLLECTION_NAME]

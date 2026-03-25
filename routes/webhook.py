@@ -1,23 +1,35 @@
 from flask import Blueprint, request, jsonify
-from services.normalizer import normalize_payload
-from services.trade_manager import handle_trade
-from services.metadata_builder import build_metadata
+from datetime import datetime
 from db import alerts_collection
+from utils.parser import parse_payload
 
 webhook_bp = Blueprint("webhook", __name__)
 
 @webhook_bp.route("/", methods=["POST"])
-def webhook():
-    data = request.get_json()
+def receive_webhook():
+    data = parse_payload(request)
 
-    normalized = normalize_payload(data)
-    meta = build_metadata(normalized)
+    document = {
+        "received_at": datetime.utcnow(),
+        "webhook_id": data.get("webhook_id"),
+        "type": data.get("type"),
+        "symbol": data.get("symbol"),
+        "exchange": data.get("exchange"),
+        "interval": data.get("interval"),
+        "price": data.get("price"),
+        "signal": data.get("signal"),
+        "volume_current": data.get("volume_current"),
+        "volume_previous": data.get("volume_previous"),
+        "open": data.get("open"),
+        "high": data.get("high"),
+        "low": data.get("low"),
+        "close": data.get("close"),
+        "candle_type": data.get("candle_type"),
+        "datetime": data.get("datetime"),
+        "timestamp": data.get("timestamp"),
+        "raw": data
+    }
 
-    alerts_collection.insert_one({
-        **normalized,
-        "meta": meta
-    })
+    alerts_collection.insert_one(document)
 
-    result = handle_trade(normalized, meta)
-
-    return jsonify({"status": "ok", "result": str(result)})
+    return jsonify({"status": "success"})
