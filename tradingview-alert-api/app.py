@@ -12,7 +12,20 @@ def create_app():
     def health():
         return {'status': 'ok'}
 
+    # ✅ Add root route (recommended)
+    @app.route('/')
+    def home():
+        return {
+            "message": "TradingView Webhook API is running 🚀",
+            "routes": {
+                "POST /webhook": "Receive TradingView alerts",
+                "GET /alerts": "Get alerts",
+                "GET /alerts/<page>": "Paginated alerts"
+            }
+        }
+
     return app
+
 
 app = create_app()
 
