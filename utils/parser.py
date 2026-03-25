@@ -2,6 +2,7 @@ import json
 
 def parse_payload(req):
     try:
+        print(req)
         if req.is_json:
             return req.get_json()
         else:
