@@ -30,7 +30,13 @@ def parse_request_payload(req):
         payload = req.form.to_dict()
 
     else:
-        payload = req.get_data(as_text=True)
+        raw = req.get_data(as_text=True)
+
+        # ✅ NEW FIX: try converting string → JSON
+        try:
+            payload = json.loads(raw)
+        except:
+            payload = raw
 
     return content_type, payload
 
@@ -98,12 +104,20 @@ def home():
 def webhook():
     content_type, parsed = parse_request_payload(request)
 
+    # ✅ NEW FIX: ensure parsed_payload is always JSON if possible
+    if isinstance(parsed, str):
+        try:
+            parsed = json.loads(parsed)
+        except:
+            pass
+
     # ✅ NEW: extract symbol & signal
     raw_data = request.get_data(as_text=True)
     symbol, signal = extract_fields(parsed, raw_data)
 
     doc = {
-        'received_at': datetime.now(timezone.utc).strftime('%d-%m-%Y %H:%M:%S'),        'content_type': content_type,
+        'received_at': datetime.now(timezone.utc).strftime('%d-%m-%Y %H:%M:%S'),
+        'content_type': content_type,
         'parsed_payload': parsed,
 
         # ✅ existing logic unchanged
