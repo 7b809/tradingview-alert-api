@@ -9,28 +9,12 @@ webhook_bp = Blueprint("webhook", __name__)
 def receive_webhook():
     data = parse_payload(request)
 
-    # document = {
-    #     "received_at": datetime.utcnow(),
-    #     "webhook_id": data.get("webhook_id"),
-    #     "type": data.get("type"),
-    #     "symbol": data.get("symbol"),
-    #     "exchange": data.get("exchange"),
-    #     "interval": data.get("interval"),
-    #     "price": data.get("price"),
-    #     "signal": data.get("signal"),
-    #     "volume_current": data.get("volume_current"),
-    #     "volume_previous": data.get("volume_previous"),
-    #     "open": data.get("open"),
-    #     "high": data.get("high"),
-    #     "low": data.get("low"),
-    #     "close": data.get("close"),
-    #     "candle_type": data.get("candle_type"),
-    #     "datetime": data.get("datetime"),
-    #     "timestamp": data.get("timestamp"),
-    #     "raw": data
-    # }
     document = {
-        "received_at": datetime.utcnow(),       
+        "received_at": datetime.utcnow(),
+        "type": data.get("type"),
+        "symbol": data.get("symbol"),
+        "trade_id": data.get("trade_id"),   # ⭐ ADD THIS
+        "timestamp": data.get("timestamp"), # ⭐ ADD THIS
         "raw": data
     }
 

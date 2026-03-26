@@ -16,8 +16,19 @@ def get_alerts(page):
     page_size = Config.PAGE_SIZE
     skip = (page - 1) * page_size
 
-    total = alerts_collection.count_documents({})
-    cursor = alerts_collection.find().sort("timestamp", -1).skip(skip).limit(page_size)
+    # ✅ Filter only records with valid trade_id
+    query = {"raw.trade_id": {"$ne": None}}
+
+    total = alerts_collection.count_documents(query)
+
+    cursor = (
+        alerts_collection
+        .find(query)
+        # ✅ Safe sorting (primary + fallback)
+        .sort([("raw.timestamp", -1), ("received_at", -1)])
+        .skip(skip)
+        .limit(page_size)
+    )
 
     data = [serialize(doc) for doc in cursor]
 
