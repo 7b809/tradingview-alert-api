@@ -5,7 +5,7 @@ from utils.parser import parse_payload
 
 webhook_bp = Blueprint("webhook", __name__)
 
-@webhook_bp.route("/", methods=["POST"])
+@webhook_bp.route("", methods=["POST"])
 def receive_webhook():
     data = parse_payload(request)
 
